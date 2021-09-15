@@ -1,8 +1,9 @@
+#By Jon Chau
 extends Node
 
 var inputControl
 var statusLabel
-enum Game {WAITING, PLAYING, END}
+enum Game {END, WAITING, PLAYING}
 
 func _ready():
 	inputControl = get_node("InputControl")

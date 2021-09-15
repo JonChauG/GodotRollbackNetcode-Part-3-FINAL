@@ -2,7 +2,6 @@
 extends KinematicBody2D
 
 var counter = -1 #testing value
-var updateCounter = counter
 var rectExtents = null
 var collisionMask = null
 var label = null
@@ -19,15 +18,14 @@ func reset_state(game_state : Dictionary):
 	if game_state.has(name):
 		position.x = game_state[name]['x']
 		position.y = game_state[name]['y']
-		updateCounter = game_state[name]['counter']
+		counter = game_state[name]['counter']
 		collisionMask = game_state[name]['collisionMask']
 	else:
-		free() #delete from memory
+		free()
 
 
 func frame_start():
-	#set update vars to current values
-	updateCounter = counter
+	#code to run at beginning of frame
 	collisionMask = Rect2(Vector2(position.x - rectExtents.x, position.y - rectExtents.y), Vector2(rectExtents.x, rectExtents.y) * 2)
 
 
@@ -35,11 +33,11 @@ func input_update(input, game_state : Dictionary):
 	#calculate state of object for the given input
 	var vect = Vector2(0, 0)
 	
-	#Collision detection for moving objects that can pass through each other
+	#Collision detection for InputControl children that can pass through each other
 	for object in game_state:
 		if object != name:
 			if collisionMask.intersects(game_state[object]['collisionMask']):
-				updateCounter += 1
+				counter += 1
 	
 	if input.local_input[0]: #W
 		vect.y -= 7
@@ -54,7 +52,7 @@ func input_update(input, game_state : Dictionary):
 		vect.x += 7
 		
 	if input.local_input[4]: #SPACE
-		updateCounter = updateCounter/2
+		counter = counter/2
 
 	#move_and_collide for "solid" stationary objects
 	var collision = move_and_collide(vect)
@@ -65,12 +63,11 @@ func input_update(input, game_state : Dictionary):
 	collisionMask = Rect2(Vector2(position.x - rectExtents.x, position.y - rectExtents.y), Vector2(rectExtents.x, rectExtents.y) * 2)
 
 
-func execute():
-	#execute calculated state of object for current frame
-	counter = updateCounter
+func frame_end():
+	#code to run at end of frame (after all input_update calls)
 	label.text = str(counter)
 
 
 func get_state():
 	#return dict of state variables to be stored in Frame_States
-	return {'x': position.x, 'y': position.y, 'counter': updateCounter, 'collisionMask': collisionMask}
+	return {'x': position.x, 'y': position.y, 'counter': counter, 'collisionMask': collisionMask}

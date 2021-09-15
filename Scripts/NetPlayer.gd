@@ -1,7 +1,12 @@
 #By Jon Chau
 extends "res://Scripts/LocalPlayer.gd"
 
-func input_update(input, game_state):
+func _ready():
+	._ready()
+	var polygon = get_node("Polygon2D")
+	polygon.color = Color(1, 1, 0, 1) #make NetPlayer yellow
+
+func input_update(input, game_state : Dictionary):
 	#calculate state of object for the given input
 	var vect = Vector2(0, 0)
 
@@ -9,7 +14,7 @@ func input_update(input, game_state):
 	for object in game_state:
 		if object != name:
 			if collisionMask.intersects(game_state[object]['collisionMask']):
-				updateCounter += 1
+				counter += 1
 
 	if input.net_input[0]: #W
 		vect.y += 7
@@ -23,8 +28,8 @@ func input_update(input, game_state):
 	if input.net_input[3]: #D
 		vect.x -= 7
 
-	if input.local_input[4]: #SPACE
-		updateCounter = updateCounter/2
+	if input.net_input[4]: #SPACE
+		counter = counter/2
 
 	#move_and_collide for "solid" stationary objects
 	var collision = move_and_collide(vect)
